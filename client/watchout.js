@@ -1,19 +1,17 @@
 var enemyRadius = 20;
 var playerRadius = 10;
+var initialData = [];
 
+// Initialize SVG
 var gameBoard = d3.select('.board').append('svg')
   .attr('width', window.innerWidth * 0.75)
   .attr('height', window.innerHeight * 0.75);
-
-
-var initialData = [];
-
-
 
 var randomRange = function(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
+// Generate first position for enemies
 var generateData = function(n) {
   var results = [];
   for (var i = 0; i < n; i++) {
@@ -22,38 +20,38 @@ var generateData = function(n) {
   return results;
 };
 
+// Initialize variables
 var sampleData = generateData(30);
 var currentScore = 0;
+var highScore = 0;
+var count = 0;
 
-var incrementScore = function(){
-  currentScore++;
-};
-
-d3.select('svg').append("rect")
+// Add background to SVG
+d3.select('svg').append('rect')
   .attr('width', '100%')
   .attr('height', '100%')
   .attr('fill', 'white');
-  
-d3.select('svg').append("defs")
- .append("pattern")
-  .attr("id", "image")
-  .attr("width", enemyRadius)
-  .attr("height", enemyRadius)
- .append("image")
-  .attr("xlink:href", 'http://vignette2.wikia.nocookie.net/the-paper-puppets-wiki-object-show/images/a/ac/Shuriken.png/revision/latest?cb=20140727162741')
-  .attr("width", enemyRadius)
-  .attr("height", enemyRadius)
-  .attr("x", 10)
-  .attr("y", 10);
+
+// Add image for enemies
+d3.select('svg').append('defs')
+ .append('pattern')
+  .attr('id', 'image')
+  .attr('width', enemyRadius)
+  .attr('height', enemyRadius)
+ .append('image')
+  .attr('xlink:href', 'http://vignette2.wikia.nocookie.net/the-paper-puppets-wiki-object-show/images/a/ac/Shuriken.png/revision/latest?cb=20140727162741')
+  .attr('width', enemyRadius)
+  .attr('height', enemyRadius)
+  .attr('x', 10)
+  .attr('y', 10);
 
 // ENEMIES //////////////////////////////////////////////////////////////////////////////////////////////
 var update = function(data) { 
   var enemies = d3.select('svg').selectAll('.enemies').data(data);
-  // debugger;
+
   // UPDATE
   enemies.transition().duration(1000).attr('cx', function(d) { return d.x; })
     .attr('cy', function(d) { return d.y; });
-    //.each("end", incrementScore);
 
   // ENTER
   enemies.enter().append('circle')
@@ -65,9 +63,11 @@ var update = function(data) {
 
 };
 
+// UPDATE LOOP
 setInterval(function() {
   var newData = sampleData.map(function(enemy) {
-    return {x: randomRange(enemyRadius, window.innerWidth * 0.75 - enemyRadius), y: randomRange(enemyRadius, window.innerHeight * 0.75 - enemyRadius)};
+    return {x: randomRange(enemyRadius, window.innerWidth * 0.75 - enemyRadius), 
+            y: randomRange(enemyRadius, window.innerHeight * 0.75 - enemyRadius)};
   });
   update(newData);
 
@@ -80,8 +80,8 @@ setInterval(function() {
 }, 1500);
 
 // PLAYER //////////////////////////////////////////////////////////////////////////////////////////////
-
-var player = d3.select('svg').selectAll('.players').data([{x: window.innerWidth / 2 * 0.75, y: window.innerHeight / 2 * 0.75}]);
+var player = d3.select('svg').selectAll('.players')
+  .data([{x: window.innerWidth / 2 * 0.75, y: window.innerHeight / 2 * 0.75}]);
 
 
 // var dragstarted = function(d) {
@@ -103,7 +103,7 @@ var drag = d3.behavior.drag()
   .on('drag', dragged);
   // .on('dragend', dragended);
 
-  // player enter
+// ENTER
 player.enter().append('circle')
   .attr('class', 'players')
   .attr('cx', function(d) { return d.x; })
@@ -111,12 +111,14 @@ player.enter().append('circle')
   .attr('r', playerRadius )
   .call(drag);
 
-var highScore = 0;
-var count = 0;  
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ // CHECK DISTANCE LOOP
 setInterval(function() {
   var enemies = d3.select('svg').selectAll('.enemies')[0];
   var currDist;
-  for (var enemy of enemies) {
+
+  for (enemy of enemies) {
     currDist = Math.sqrt(Math.pow((enemy.cx.baseVal.value - player[0][0].cx.baseVal.value), 2) 
       + Math.pow((enemy.cy.baseVal.value - player[0][0].cy.baseVal.value), 2));
     if (currDist < enemyRadius + playerRadius) {
@@ -125,17 +127,16 @@ setInterval(function() {
       }
       currentScore = -1;
       count++;
-
     }
   }
 
   d3.select('.collisions').selectAll('span')
   .data([count])
-  .text(function(d){return d;});
+  .text(function(d) { return d; });
 
   d3.select('.highscore').selectAll('span')
   .data([highScore])
-  .text(function(d){return d;});
+  .text(function(d) { return d; });
 
 }, 200);
 
