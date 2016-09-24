@@ -2,16 +2,23 @@
 
 /* Note: an asteroid image is included in this repo.
 Feel free to use it if you like. */
-svg {
+/*svg {
   width: 75%;
   height: 75%;
   top: 12.5%;
   left: 12.5%;
-}
+}*/
 body {
-  background-color: "blue";
+  background-color: blanchedalmond
 }
 .scoreboard {
   background-color: "green";
 }
+
+.board {
+  margin-left: 12.5%;
+}
+
+
+
 
